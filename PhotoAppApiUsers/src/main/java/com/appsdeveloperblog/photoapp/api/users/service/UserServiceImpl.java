@@ -15,15 +15,17 @@ import java.util.UUID;
 public class UserServiceImpl implements UsersService {
 
     UserRepository usersRepository;
-    //BCryptPasswordEncoder bCryptPasswordEncoder;
+    BCryptPasswordEncoder bCryptPasswordEncoder;
     //RestTemplate restTemplate;
 
 
 
     @Autowired
-    public UserServiceImpl(UserRepository usersRepository)
+    public UserServiceImpl(UserRepository usersRepository,
+               BCryptPasswordEncoder bCryptPasswordEncoder)
     {
         this.usersRepository = usersRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     @Override
@@ -31,12 +33,13 @@ public class UserServiceImpl implements UsersService {
         // TODO Auto-generated method stub
 
         userDetails.setUserId(UUID.randomUUID().toString());
+        userDetails.setEncryptedPassword(bCryptPasswordEncoder.encode(userDetails.getPassword()));
 
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
         UserEntity userEntity = modelMapper.map(userDetails, UserEntity.class);
-        userEntity.setEncryptedPassword("testtest");
+
 
 
         usersRepository.save(userEntity);

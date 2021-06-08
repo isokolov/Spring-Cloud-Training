@@ -14,10 +14,19 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 @EnableWebSecurity
 public class WebSecurity extends WebSecurityConfigurerAdapter {
 
+    private Environment environment;
+
+    @Autowired
+    public WebSecurity(Environment environment)
+    {
+        this.environment = environment;
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
-        http.authorizeRequests().antMatchers("/**").permitAll();
+        http.authorizeRequests().antMatchers("/**").hasIpAddress(environment.getProperty("gateway.ip"));
+        http.headers().frameOptions().disable(); // for h2 to run with spring security
     }
 
 }
